@@ -132,10 +132,10 @@ def handle_characters():
     return jsonify(charactersList), 200
 
 #Single character
-@app.route('/characters/<int:characters_name>', methods=['GET'])
-def single_character(characters_name):
+@app.route('/characters/<int:characters_id>', methods=['GET'])
+def single_character(characters_id):
     
-    character = Characters.query.filter_by(name=characters_name).first()
+    character = Characters.query.filter_by(id=characters_id).first()
     return jsonify(character.serialize()), 200
 
 #Planets
@@ -147,10 +147,10 @@ def handle_planets():
     return jsonify(planetsList), 200
 
 #Single planet
-@app.route('/planets/<int:planets_name>', methods=['GET'])
-def single_planet(planets_name):
+@app.route('/planets/<int:planets_id>', methods=['GET'])
+def single_planet(planets_id):
     
-    planet = Planets.query.filter_by(name=planets_name).first()
+    planet = Planets.query.filter_by(id=planets_id).first()
     return jsonify(planet.serialize()), 200
 
 #Vehicles
@@ -162,10 +162,10 @@ def handle_vehicles():
     return jsonify(vehiclesList), 200
 
 #Single vehicle
-@app.route('/vehicles/<int:vehicles_name>', methods=['GET'])
-def single_vehicle(vehicles_name):
+@app.route('/vehicles/<int:vehicles_id>', methods=['GET'])
+def single_vehicle(vehicles_id):
     
-    vehicle = Vehicles.query.filter_by(name=vehicles_name).first()
+    vehicle = Vehicles.query.filter_by(id=vehicles_id).first()
     return jsonify(vehicle.serialize()), 200
 
 #Favorites
