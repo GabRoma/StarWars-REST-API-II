@@ -8,7 +8,7 @@ from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, User, Planets, Characters, Vehicles
+from models import db, User, Planets, Characters, Vehicles, Favorites
 
 app = Flask(__name__)
 app.url_map.strict_slashes = False
@@ -90,7 +90,7 @@ def handle_user():
 
     return jsonify(results), 200
 
-#GET single user
+#GET Single User
 @app.route('/user/<int:user_id>', methods=['GET'])
 def single_user(user_id):
     
@@ -107,7 +107,9 @@ def create_character():
     request_body_character = request.get_json()
 
     newCharacter = Characters(
-        name=request_body_character["name"], url=request_body_character["url"], species=request_body_character["species"],
+        name=request_body_character["name"], 
+        url=request_body_character["url"], 
+        species=request_body_character["species"],
         gender=request_body_character["gender"],
         birthYear=request_body_character["birthYear"],
         height=request_body_character["height"],
@@ -123,6 +125,56 @@ def create_character():
 
     return jsonify(request_body_character), 200
 
+#UPDATE Character
+@app.route('/characters/<int:characters_id>', methods=['PUT'])
+def update_character(characters_id):
+
+    request_body_character = request.get_json()
+
+    thisCharacter = Characters.query.get(characters_id)
+    if thisCharacter is None:
+        raise APIException('Character not found', status_code=404)
+    if "name" in request_body_character:
+        thisCharacter.name = body["name"]
+    if "url" in request_body_character:
+        thisCharacter.url = body["url"]
+    if "species" in request_body_character:
+        thisCharacter.species = request_body_character["species"]
+    if "gender" in request_body_character:
+        thisCharacter.gender = request_body_character["gender"]
+    if "birthYear" in request_body_character:
+        thisCharacter.birthYear = request_body_character["birthYear"]
+    if "height" in request_body_character:
+        thisCharacter.height = request_body_character["height"]
+    if "mass" in request_body_character:
+        thisCharacter.mass = request_body_character["mass"]
+    if "hairColor" in request_body_character:
+        thisCharacter.hairColor = request_body_character["hairColor"]
+    if "eyeColor" in request_body_character:
+        thisCharacter.eyeColor = request_body_character["eyeColor"]
+    if "skinColor" in request_body_character:
+        thisCharacter.skinColor = request_body_character["skinColor"]
+    if "films" in request_body_character:
+        thisCharacter.films = request_body_character["films"]
+    if "created" in request_body_character:
+        thisCharacter.created = request_body_character["created"]
+    if "edited" in request_body_character:
+        thisCharacter.edited = request_body_character["edited"]
+    db.session.commit()
+
+    return jsonify(request_body_character), 200
+
+#DELETE Character
+@app.route('/characters/<int:characters_id>', methods=['DELETE'])
+def delete_character(characters_id):
+    thatCharacter = Characters.query.get(characters_id)
+    if thatCharacter is None:
+        raise APIException('Character not found', status_code=404)
+    db.session.delete(thatCharacter)
+    db.session.commit()
+
+    return jsonify("character deleted"), 200
+
 #GET Characters
 @app.route('/characters', methods=['GET'])
 def handle_characters():
@@ -131,29 +183,195 @@ def handle_characters():
 
     return jsonify(charactersList), 200
 
-#Single character
+#GET Single Character
 @app.route('/characters/<int:characters_id>', methods=['GET'])
 def single_character(characters_id):
     
     character = Characters.query.filter_by(id=characters_id).first()
+    if character is None:
+        raise APIException('Character not found', status_code=404)
     return jsonify(character.serialize()), 200
 
 #Planets
+
+#POST Planet
+@app.route('/planets', methods=['POST'])
+def create_planet():
+
+    request_body_planet = request.get_json()
+
+    newPlanet = Planets(
+        name=request_body_planet["name"],
+        url=request_body_planet["url"],
+        diameter=request_body_planet["diameter"],
+        population=request_body_planet["population"],
+        climate=request_body_planet["climate"],
+        terrain=request_body_planet["terrain"],
+        surfaceWater=request_body_planet["surfaceWater"],
+        rotationPeriod=request_body_planet["rotationPeriod"],
+        orbitalPeriod=request_body_planet["orbitalPeriod"],
+        gravity=request_body_planet["gravity"],
+        films=request_body_planet["films"],
+        created=request_body_planet["created"],
+        edited=request_body_planet["edited"]
+        )
+    db.session.add(newPlanet)
+    db.session.commit()
+
+    return jsonify(request_body_planet), 200
+
+#UPDATE Planet
+@app.route('/planets/<int:planets_id>', methods=['PUT'])
+def update_planet(planets_id):
+
+    request_body_planet = request.get_json()
+
+    thisPlanet = Planets.query.get(planets_id)
+    if thisPlanet is None:
+        raise APIException('Planet not found', status_code=404)
+    if "name" in request_body_planet:
+        thisPlanet.name = body["name"]
+    if "url" in request_body_planet:
+        thisPlanet.url = body["url"]
+    if "diameter" in request_body_planet:
+        thisPlanet.diameter = request_body_planet["diameter"]
+    if "population" in request_body_planet:
+        thisPlanet.population = request_body_planet["population"]
+    if "climate" in request_body_planet:
+        thisPlanet.climate = request_body_planet["climate"]
+    if "terrain" in request_body_planet:
+        thisPlanet.terrain = request_body_planet["terrain"]
+    if "surfaceWater" in request_body_planet:
+        thisPlanet.surfaceWater = request_body_planet["surfaceWater"]
+    if "rotationPeriod" in request_body_planet:
+        thisPlanet.rotationPeriod = request_body_planet["rotationPeriod"]
+    if "orbitalPeriod" in request_body_planet:
+        thisPlanet.orbitalPeriod = request_body_planet["orbitalPeriod"]
+    if "gravity" in request_body_planet:
+        thisPlanet.gravity = request_body_planet["gravity"]
+    if "films" in request_body_planet:
+        thisPlanet.films = request_body_planet["films"]
+    if "created" in request_body_planet:
+        thisPlanet.created = request_body_planet["created"]
+    if "edited" in request_body_planet:
+        thisPlanet.edited = request_body_planet["edited"]
+    db.session.commit()
+
+    return jsonify(request_body_planet), 200
+
+#DELETE Planet
+@app.route('/planets/<int:planets_id>', methods=['DELETE'])
+def delete_planet(planets_id):
+    thatPlanet = Planets.query.get(planets_id)
+    if thatPlanet is None:
+        raise APIException('Planet not found', status_code=404)
+    db.session.delete(thatPlanet)
+    db.session.commit()
+
+    return jsonify("planet deleted"), 200
+
+#GET Planets
 @app.route('/planets', methods=['GET'])
 def handle_planets():
-    allplanets = Planet.query.all()
+    allplanets = Planets.query.all()
     planetsList = list(map(lambda p: p.serialize(),allplanets))
 
     return jsonify(planetsList), 200
 
-#Single planet
+#GET Single Planet
 @app.route('/planets/<int:planets_id>', methods=['GET'])
 def single_planet(planets_id):
     
     planet = Planets.query.filter_by(id=planets_id).first()
+    if planet is None:
+        raise APIException('Planet not found', status_code=404)
     return jsonify(planet.serialize()), 200
 
 #Vehicles
+
+#POST Vehicle
+@app.route('/vehicles', methods=['POST'])
+def create_vehicle():
+
+    request_body_vehicle = request.get_json()
+
+    newVehicle = Vehicles(
+        name=request_body_vehicle["name"],
+        url=request_body_vehicle["url"],
+        type=request_body_vehicle["type"],
+        model=request_body_vehicle["model"],
+        manufactured=request_body_vehicle["manufactured"],
+        length=request_body_vehicle["length"],
+        consumables=request_body_vehicle["consumables"],
+        speed=request_body_vehicle["speed"],
+        cost=request_body_vehicle["cost"],
+        capacity=request_body_vehicle["capacity"],
+        crew=request_body_vehicle["crew"],
+        passengers=request_body_vehicle["passengers"],
+        films=request_body_vehicle["films"],
+        created=request_body_vehicle["created"],
+        edited=request_body_vehicle["edited"]
+        )
+    db.session.add(newVehicle)
+    db.session.commit()
+
+    return jsonify(request_body_vehicle), 200
+
+#UPDATE Vehicle
+@app.route('/vehicles/<int:vehicles_id>', methods=['PUT'])
+def update_vehicle(vehicles_id):
+
+    request_body_vehicle = request.get_json()
+
+    thisVehicle = Vehicles.query.get(vehicles_id)
+    if thisVehicle is None:
+        raise APIException('Vehicle not found', status_code=404)
+    if "name" in request_body_vehicle:
+        thisVehicle.name = body["name"]
+    if "url" in request_body_vehicle:
+        thisVehicle.url = body["url"]
+    if "type" in request_body_vehicle:
+        thisVehicle.type = request_body_vehicle["type"]
+    if "model" in request_body_vehicle:
+        thisVehicle.model = request_body_vehicle["model"]
+    if "manufactured" in request_body_vehicle:
+        thisVehicle.manufactured = request_body_vehicle["manufactured"]
+    if "length" in request_body_vehicle:
+        thisVehicle.length = request_body_vehicle["length"]
+    if "consumables" in request_body_vehicle:
+        thisVehicle.consumables = request_body_vehicle["consumables"]
+    if "speed" in request_body_vehicle:
+        thisVehicle.speed = request_body_vehicle["speed"]
+    if "cost" in request_body_vehicle:
+        thisVehicle.cost = request_body_vehicle["cost"]
+    if "capacity" in request_body_vehicle:
+        thisVehicle.capacity = request_body_vehicle["capacity"]
+    if "crew" in request_body_vehicle:
+        thisVehicle.crew = request_body_vehicle["crew"]
+    if "passengers" in request_body_vehicle:
+        thisVehicle.passengers = request_body_vehicle["passengers"]
+    if "films" in request_body_vehicle:
+        thisVehicle.films = request_body_vehicle["films"]
+    if "created" in request_body_vehicle:
+        thisVehicle.created = request_body_vehicle["created"]
+    if "edited" in request_body_vehicle:
+        thisVehicle.edited = request_body_vehicle["edited"]
+    db.session.commit()
+
+    return jsonify(request_body_vehicle), 200
+
+#DELETE Vehicle
+@app.route('/vehicles/<int:vehicles_id>', methods=['DELETE'])
+def delete_vehicle(vehicles_id):
+    thatVehicle = Vehicles.query.get(vehicles_id)
+    if thatVehicle is None:
+        raise APIException('Vehicle not found', status_code=404)
+    db.session.delete(thatVehicle)
+    db.session.commit()
+
+    return jsonify("vehicle deleted"), 200
+
+#GET Vehicles
 @app.route('/vehicles', methods=['GET'])
 def handle_vehicles():
     allvehicles = Vehicles.query.all()
@@ -161,14 +379,42 @@ def handle_vehicles():
 
     return jsonify(vehiclesList), 200
 
-#Single vehicle
+#GET Single Vehicle
 @app.route('/vehicles/<int:vehicles_id>', methods=['GET'])
 def single_vehicle(vehicles_id):
     
     vehicle = Vehicles.query.filter_by(id=vehicles_id).first()
+    if vehicle is None:
+        raise APIException('Vehicle not found', status_code=404)
     return jsonify(vehicle.serialize()), 200
 
 #Favorites
+
+#POST Favorite
+@app.route('/favorites', methods=['POST'])
+def create_favorite():
+
+    request_body_favorite = request.get_json()
+
+    newFav = Favorites(
+        name=request_body_favorite["name"])
+    db.session.add(newFav)
+    db.session.commit()
+
+    return jsonify("added to favorites"), 200
+
+#DELETE Favorite
+@app.route('/favorites/<int:favorites_id>', methods=['DELETE'])
+def delete_favorite(favorites_id):
+    thatFav = Favorites.query.get(favorites_id)
+    if thatFav is None:
+        raise APIException('Favorite not found', status_code=404)
+    db.session.delete(thatFav)
+    db.session.commit()
+
+    return jsonify("Favorite deleted"), 200
+
+#GET Favorites
 @app.route('/favorites', methods=['GET'])
 def handle_favorites():
     allfavorites = Favorites.query.all()
@@ -176,11 +422,13 @@ def handle_favorites():
 
     return jsonify(favoritesList), 200
 
-#Single favorite
+#GET Single Favorite
 @app.route('/favorites/<int:favorites_id>', methods=['GET'])
 def single_favorite(favorites_id):
     
     favorite = Favorites.query.filter_by(id=favorites_id).first()
+    if favorite is None:
+        raise APIException('Favorite not found', status_code=404)
     return jsonify(favorite.serialize()), 200
 
 #Endpoints end

@@ -125,14 +125,14 @@ class Vehicles(db.Model):
             "id": self.id,
             "name": self.name,
             "url": self.url,
-            "type": self.vehicleClass,
+            "type": self.type,
             "model": self.model,
             "manufactured": self.manufactured,
             "length": self.length,
             "consumables": self.consumables,
-            "speed": self.maxAtmSpeed,
-            "cost": self.costinCredits,
-            "capacity": self.cargoCapacity,
+            "speed": self.speed,
+            "cost": self.cost,
+            "capacity": self.capacity,
             "crew": self.crew,
             "passengers": self.passengers,
             "films": self.films,
@@ -151,7 +151,7 @@ class Favorites(db.Model):
     # vehicles_id = db.Column(db.Integer, db.ForeignKey('vehicles.id'))
             
     def __repr__(self):
-        return '<Favorites %r>' % self.id
+        return '<Favorites %r>' % self.name
 
     def serialize(self):
         return {
