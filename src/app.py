@@ -50,7 +50,7 @@ def create_user():
     db.session.add(newUser)
     db.session.commit()
 
-    return jsonify(request_body_user), 200
+    return jsonify("New user added successfully"), 200
 
 #UPDATE User
 @app.route('/user/<int:user_id>', methods=['PUT'])
@@ -69,7 +69,7 @@ def update_user(user_id):
         thisuser.password = request_body_user["password"]
     db.session.commit()
 
-    return jsonify(request_body_user), 200
+    return jsonify("User data updated"), 200
 
 #DELETE User
 @app.route('/user/<int:user_id>', methods=['DELETE'])
@@ -80,7 +80,7 @@ def delete_user(user_id):
     db.session.delete(thatuser)
     db.session.commit()
 
-    return jsonify("user deleted"), 200
+    return jsonify("User deleted"), 200
 
 #GET Users
 @app.route('/user', methods=['GET'])
@@ -123,7 +123,7 @@ def create_character():
     db.session.add(newCharacter)
     db.session.commit()
 
-    return jsonify(request_body_character), 200
+    return jsonify("New character added successfully"), 200
 
 #UPDATE Character
 @app.route('/characters/<int:characters_id>', methods=['PUT'])
@@ -162,7 +162,7 @@ def update_character(characters_id):
         thisCharacter.edited = request_body_character["edited"]
     db.session.commit()
 
-    return jsonify(request_body_character), 200
+    return jsonify("Character updated"), 200
 
 #DELETE Character
 @app.route('/characters/<int:characters_id>', methods=['DELETE'])
@@ -173,7 +173,7 @@ def delete_character(characters_id):
     db.session.delete(thatCharacter)
     db.session.commit()
 
-    return jsonify("character deleted"), 200
+    return jsonify("Character deleted"), 200
 
 #GET Characters
 @app.route('/characters', methods=['GET'])
@@ -218,7 +218,7 @@ def create_planet():
     db.session.add(newPlanet)
     db.session.commit()
 
-    return jsonify(request_body_planet), 200
+    return jsonify("New planet added successfully"), 200
 
 #UPDATE Planet
 @app.route('/planets/<int:planets_id>', methods=['PUT'])
@@ -257,7 +257,7 @@ def update_planet(planets_id):
         thisPlanet.edited = request_body_planet["edited"]
     db.session.commit()
 
-    return jsonify(request_body_planet), 200
+    return jsonify("Planet updated"), 200
 
 #DELETE Planet
 @app.route('/planets/<int:planets_id>', methods=['DELETE'])
@@ -268,7 +268,7 @@ def delete_planet(planets_id):
     db.session.delete(thatPlanet)
     db.session.commit()
 
-    return jsonify("planet deleted"), 200
+    return jsonify("Planet deleted"), 200
 
 #GET Planets
 @app.route('/planets', methods=['GET'])
@@ -315,7 +315,7 @@ def create_vehicle():
     db.session.add(newVehicle)
     db.session.commit()
 
-    return jsonify(request_body_vehicle), 200
+    return jsonify("New vehicle added successfully"), 200
 
 #UPDATE Vehicle
 @app.route('/vehicles/<int:vehicles_id>', methods=['PUT'])
@@ -358,7 +358,7 @@ def update_vehicle(vehicles_id):
         thisVehicle.edited = request_body_vehicle["edited"]
     db.session.commit()
 
-    return jsonify(request_body_vehicle), 200
+    return jsonify("Vehicle updated"), 200
 
 #DELETE Vehicle
 @app.route('/vehicles/<int:vehicles_id>', methods=['DELETE'])
@@ -369,7 +369,7 @@ def delete_vehicle(vehicles_id):
     db.session.delete(thatVehicle)
     db.session.commit()
 
-    return jsonify("vehicle deleted"), 200
+    return jsonify("Vehicle deleted"), 200
 
 #GET Vehicles
 @app.route('/vehicles', methods=['GET'])
@@ -390,43 +390,92 @@ def single_vehicle(vehicles_id):
 
 #Favorites
 
-#POST Favorite
-@app.route('/favorites', methods=['POST'])
-def create_favorite():
-
+#POST Favorite Character
+@app.route('/user/<int:user_id>/favorites/characters', methods=['POST'])
+def add_favorite_character(user_id):
     request_body_favorite = request.get_json()
-
     newFav = Favorites(
-        name=request_body_favorite["name"])
+        user_id=user_id, characters_id=request_body_favorite["characters_id"])
     db.session.add(newFav)
     db.session.commit()
 
-    return jsonify("added to favorites"), 200
+    return jsonify("Character added to favorites"), 200
 
-#DELETE Favorite
-@app.route('/favorites/<int:favorites_id>', methods=['DELETE'])
-def delete_favorite(favorites_id):
-    thatFav = Favorites.query.get(favorites_id)
+#DELETE Favorite Character
+@app.route('/user/<int:user_id>/favorites/characters/', methods=['DELETE'])
+def delete_favorite_character(user_id):
+    request_body = request.get_json()
+    thatFav = Favorites.query.filter_by(user_id=user_id, characters_id=request_body["characters_id"]).first()
     if thatFav is None:
         raise APIException('Favorite not found', status_code=404)
     db.session.delete(thatFav)
     db.session.commit()
 
-    return jsonify("Favorite deleted"), 200
+    return jsonify("Character deleted from favorites"), 200
+
+#POST Favorite Planet
+@app.route('/user/<int:user_id>/favorites/planets', methods=['POST'])
+def add_favorite_planet(user_id):
+    
+    request_body_favorite = request.get_json()
+
+    newFav = Favorites(
+        user_id=user_id, planets_id=request_body_favorite["planets_id"])
+    db.session.add(newFav)
+    db.session.commit()
+
+    return jsonify("Planet added to favorites"), 200
+
+#DELETE Favorite Planet
+@app.route('/user/<int:user_id>/favorites/planets/', methods=['DELETE'])
+def delete_favorite_planet(user_id):
+    request_body = request.get_json()
+    thatFav = Favorites.query.filter_by(user_id=user_id, planets_id=request_body["planets_id"]).first()
+    if thatFav is None:
+        raise APIException('Favorite not found', status_code=404)
+    db.session.delete(thatFav)
+    db.session.commit()
+
+    return jsonify("Planet deleted from favorites"), 200
+
+#POST Favorite Vehicle
+@app.route('/user/<int:user_id>/favorites/vehicles', methods=['POST'])
+def add_favorite_vehicle(user_id):
+    
+    request_body_favorite = request.get_json()
+
+    newFav = Favorites(
+        user_id=user_id, vehicles_id=request_body_favorite["vehicles_id"])
+    db.session.add(newFav)
+    db.session.commit()
+
+    return jsonify("Vehicle added to favorites"), 200
+
+#DELETE Favorite Vehicle
+@app.route('/user/<int:user_id>/favorites/vehicles/', methods=['DELETE'])
+def delete_favorite_vehicle(user_id):
+    request_body = request.get_json()
+    thatFav = Favorites.query.filter_by(user_id=user_id, vehicles_id=request_body["vehicles_id"]).first()
+    if thatFav is None:
+        raise APIException('Favorite not found', status_code=404)
+    db.session.delete(thatFav)
+    db.session.commit()
+
+    return jsonify("Vehicle deleted from favorites"), 200
 
 #GET Favorites
-@app.route('/favorites', methods=['GET'])
-def handle_favorites():
-    allfavorites = Favorites.query.all()
+@app.route('/user/<int:user_id>/favorites', methods=['GET'])
+def handle_favorites(user_id):
+    allfavorites = Favorites.query.filter_by(user_id=user_id).all()
     favoritesList = list(map(lambda fav: fav.serialize(),allfavorites))
 
     return jsonify(favoritesList), 200
 
-#GET Single Favorite
-@app.route('/favorites/<int:favorites_id>', methods=['GET'])
-def single_favorite(favorites_id):
-    
-    favorite = Favorites.query.filter_by(id=favorites_id).first()
+# #GET Single Favorite 
+@app.route('/user/<int:user_id>/favorites/<int:favorites_id>', methods=['GET'])
+def single_fav(user_id, favorites_id):
+
+    favorite = Favorites.query.filter_by(user_id=user_id, id=favorites_id).first()
     if favorite is None:
         raise APIException('Favorite not found', status_code=404)
     return jsonify(favorite.serialize()), 200

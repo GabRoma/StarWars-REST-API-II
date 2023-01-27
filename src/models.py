@@ -8,6 +8,7 @@ class User(db.Model):
     username = db.Column(db.String(80), unique=True, nullable=False)
     password = db.Column(db.String(80), unique=False, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
+    favorites = db.relationship('Favorites', backref='user', lazy=True)
 
     def __repr__(self):
         return '<User %r>' % self.id
@@ -36,6 +37,7 @@ class Characters(db.Model):
     films = db.Column(db.String(250), nullable=False)
     created = db.Column(db.String(250), nullable=False)
     edited = db.Column(db.String(250), nullable=False)
+    favorites = db.relationship('Favorites', backref='characters', lazy=True)
 
     def __repr__(self):
         return '<Characters %r>' % self.name
@@ -75,6 +77,7 @@ class Planets(db.Model):
     films = db.Column(db.String(250), nullable=False)
     created = db.Column(db.String(250), nullable=False)
     edited = db.Column(db.String(250), nullable=False)
+    favorites = db.relationship('Favorites', backref='planets', lazy=True)
 
     def __repr__(self):
         return '<Planets %r>' % self.name
@@ -116,6 +119,7 @@ class Vehicles(db.Model):
     films = db.Column(db.String(250), nullable=False)
     created = db.Column(db.String(250), nullable=False)
     edited = db.Column(db.String(250), nullable=False)
+    favorites = db.relationship('Favorites', backref='vehicles', lazy=True)
 
     def __repr__(self):
         return '<Vehicles %r>' % self.name
@@ -144,18 +148,21 @@ class Vehicles(db.Model):
 #Favorites start
 class Favorites(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(250), nullable=False)
-    # user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    # characters_id = db.Column(db.Integer, db.ForeignKey('characters.id'))
-    # planets_id = db.Column(db.Integer, db.ForeignKey('planets.id'))
-    # vehicles_id = db.Column(db.Integer, db.ForeignKey('vehicles.id'))
-            
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    characters_id = db.Column(db.Integer, db.ForeignKey('characters.id'))
+    planets_id = db.Column(db.Integer, db.ForeignKey('planets.id'))
+    vehicles_id = db.Column(db.Integer, db.ForeignKey('vehicles.id'))
+
+    
     def __repr__(self):
         return '<Favorites %r>' % self.name
 
     def serialize(self):
         return {
             "id": self.id,
-            "name": self.name
+            "user_id": self.user_id,
+            "characters_id": self.characters_id,
+            "vehicles_id": self.vehicles_id,
+            "planets_id": self.planets_id,
         }
 #Favorites end
