@@ -9,6 +9,10 @@ from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
 from models import db, User, Planets, Characters, Vehicles, Favorites
+from flask_jwt_extended import create_access_token
+from flask_jwt_extended import get_jwt_identity
+from flask_jwt_extended import jwt_required
+from flask_jwt_extended import JWTManager
 
 app = Flask(__name__)
 app.url_map.strict_slashes = False
@@ -25,6 +29,10 @@ db.init_app(app)
 CORS(app)
 setup_admin(app)
 
+# Setup the Flask-JWT-Extended extension
+app.config["JWT_SECRET_KEY"] = "super-secret"  # Change this!
+jwt = JWTManager(app)
+
 # Handle/serialize errors like a JSON object
 @app.errorhandler(APIException)
 def handle_invalid_usage(error):
@@ -38,9 +46,41 @@ def sitemap():
 
 #Endpoints start
 
+
+#Autentication
+
+#Log in
+@app.route("/login", methods=["POST"])
+def login():
+    username = request.json.get("username", None)
+    password = request.json.get("password", None)
+
+    user = User.query.filter_by(username=username).first()
+
+    if username != user.username or password != user.password:
+        return jsonify({"msg": "Bad username or password"}), 401
+
+    access_token = create_access_token(identity=username)
+    return jsonify(access_token=access_token)
+
+# Profile / Private page
+@app.route("/profile", methods=["GET"])
+@jwt_required()
+def profile():
+    
+    current_user = get_jwt_identity()
+    user = User.query.filter_by(username=current_user).first()
+
+    response = {
+        "logged in as":user.username,
+        "user data":user.serialize()
+    }
+    return jsonify(response), 200
+
+
 #User
 
-#POST User
+#POST User / Sign up
 @app.route('/user', methods=['POST'])
 def create_user():
 
