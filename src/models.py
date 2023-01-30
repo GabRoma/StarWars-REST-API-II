@@ -155,7 +155,7 @@ class Favorites(db.Model):
 
     
     def __repr__(self):
-        return '<Favorites %r>' % self.name
+        return '<Favorites %r>' % self.id
 
     def serialize(self):
         return {

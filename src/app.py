@@ -434,12 +434,15 @@ def single_vehicle(vehicles_id):
 @app.route('/user/<int:user_id>/favorites/characters', methods=['POST'])
 def add_favorite_character(user_id):
     request_body_favorite = request.get_json()
-    newFav = Favorites(
-        user_id=user_id, characters_id=request_body_favorite["characters_id"])
-    db.session.add(newFav)
-    db.session.commit()
-
-    return jsonify("Character added to favorites"), 200
+    favs = Favorites.query.filter_by(user_id=user_id, characters_id=request_body_favorite["characters_id"]).first()
+    if favs is None:
+        newFav = Favorites(
+            user_id=user_id, characters_id=request_body_favorite["characters_id"])    
+        db.session.add(newFav)
+        db.session.commit()
+        return jsonify("Character added to favorites"), 200
+    else:
+        return jsonify("This character has already been added to your favorites"), 400
 
 #DELETE Favorite Character
 @app.route('/user/<int:user_id>/favorites/characters/', methods=['DELETE'])
@@ -458,13 +461,16 @@ def delete_favorite_character(user_id):
 def add_favorite_planet(user_id):
     
     request_body_favorite = request.get_json()
-
-    newFav = Favorites(
-        user_id=user_id, planets_id=request_body_favorite["planets_id"])
-    db.session.add(newFav)
-    db.session.commit()
-
-    return jsonify("Planet added to favorites"), 200
+    
+    favs = Favorites.query.filter_by(user_id=user_id, planets_id=request_body_favorite["planets_id"]).first()
+    if favs is None:
+        newFav = Favorites(
+            user_id=user_id, planets_id=request_body_favorite["planets_id"])    
+        db.session.add(newFav)
+        db.session.commit()
+        return jsonify("Planet added to favorites"), 200
+    else:
+        return jsonify("This planet has already been added to your favorites"), 400
 
 #DELETE Favorite Planet
 @app.route('/user/<int:user_id>/favorites/planets/', methods=['DELETE'])
@@ -484,12 +490,15 @@ def add_favorite_vehicle(user_id):
     
     request_body_favorite = request.get_json()
 
-    newFav = Favorites(
-        user_id=user_id, vehicles_id=request_body_favorite["vehicles_id"])
-    db.session.add(newFav)
-    db.session.commit()
-
-    return jsonify("Vehicle added to favorites"), 200
+    favs = Favorites.query.filter_by(user_id=user_id, vehicles_id=request_body_favorite["vehicles_id"]).first()
+    if favs is None:
+        newFav = Favorites(
+            user_id=user_id, vehicles_id=request_body_favorite["vehicles_id"])    
+        db.session.add(newFav)
+        db.session.commit()
+        return jsonify("Vehicle added to favorites"), 200
+    else:
+        return jsonify("This vehicle has already been added to your favorites"), 400
 
 #DELETE Favorite Vehicle
 @app.route('/user/<int:user_id>/favorites/vehicles/', methods=['DELETE'])
