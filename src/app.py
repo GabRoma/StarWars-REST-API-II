@@ -58,15 +58,15 @@ def login():
     user = User.query.filter_by(username=username).first()
 
     if username != user.username or password != user.password:
-        return jsonify({"msg": "Bad username or password"}), 401
+        return jsonify({"msg": "Wrong username or password"}), 401
 
     access_token = create_access_token(identity=username)
     return jsonify(access_token=access_token)
 
-# Profile / Private page
-@app.route("/profile", methods=["GET"])
+# Protected page
+@app.route("/protected", methods=["GET"])
 @jwt_required()
-def profile():
+def protected():
     
     current_user = get_jwt_identity()
     user = User.query.filter_by(username=current_user).first()
